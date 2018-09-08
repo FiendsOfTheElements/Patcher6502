@@ -1,8 +1,8 @@
 ﻿//-----------------------------------------------------------------------------
-// Copyright (c) 2017, 2018 informedcitizenry <informedcitizenry@gmail.com>
-//
-// Licensed under the MIT license. See LICENSE for full license information.
-// 
+// Original code copyright (c) 2017, 2018 informedcitizenry <informedcitizenry@gmail.com>
+// Licensed and modified under the MIT license.
+// Modification copyright drcatdoctor. 
+// GPL. See LICENSE for full license information.
 //-----------------------------------------------------------------------------
 
 using System;
@@ -46,14 +46,14 @@ namespace DotNetAsm
     }
 
     /// <summary>
-    /// Implements an assembly controller to process source input and convert 
+    /// Implements an assembly controller to process source input and convert
     /// to assembled output.
     /// </summary>
-    public sealed class AssemblyController : AssemblerBase, IAssemblyController
+    public class AssemblyController : AssemblerBase, IAssemblyController
     {
         #region Members
 
-        Preprocessor _preprocessor;
+        protected Preprocessor _preprocessor;
         Stack<ILineAssembler> _assemblers;
         List<IBlockHandler> _blockHandlers;
         List<SourceLine> _processedLines;
@@ -69,7 +69,7 @@ namespace DotNetAsm
         #region Constructors
 
         /// <summary>
-        /// Constructs an instance of a <see cref="T:DotNetAsm.AssemblyController"/>, which controls the 
+        /// Constructs an instance of a <see cref="T:DotNetAsm.AssemblyController"/>, which controls the
         /// assembly process.
         /// </summary>
         /// <param name="args">The array of <see cref="T:System.String"/> args passed by the commandline.</param>
@@ -159,7 +159,7 @@ namespace DotNetAsm
 
         bool IsSymbolName(string token, bool allowLeadUnderscore = true, bool allowDot = true)
         {
-            // empty string 
+            // empty string
             if (string.IsNullOrEmpty(token))
                 return false;
 
@@ -185,7 +185,7 @@ namespace DotNetAsm
         /// <remarks>
         /// Define macros and segments, and add included source files.
         /// </remarks>
-        IEnumerable<SourceLine> Preprocess()
+        protected virtual IEnumerable<SourceLine> Preprocess()
         {
             var source = new List<SourceLine>();
 
@@ -215,7 +215,7 @@ namespace DotNetAsm
         /// <remarks>
         /// Add labels defined with command-line -D option
         /// </remarks>
-        IEnumerable<SourceLine> ProcessDefinedLabels()
+        protected IEnumerable<SourceLine> ProcessDefinedLabels()
         {
             var labels = new List<SourceLine>();
 
@@ -248,7 +248,7 @@ namespace DotNetAsm
             return labels;
         }
 
-        void OnCpuChanged(SourceLine line)
+        protected void OnCpuChanged(SourceLine line)
         {
             if (CpuChanged != null)
                 CpuChanged.Invoke(new CpuChangedEventArgs { Line = line });
@@ -256,7 +256,7 @@ namespace DotNetAsm
                 Log.LogEntry(line, ErrorStrings.UnknownInstruction, line.Instruction);
         }
 
-        void FirstPass(IEnumerable<SourceLine> source)
+        protected void FirstPass(IEnumerable<SourceLine> source)
         {
             _passes = 0;
             int id = 1;
@@ -393,8 +393,8 @@ namespace DotNetAsm
             {
                 if (_currentLine.Label.First() == '_')
                     label = string.Concat(_localLabelScope, _currentLine.Label);
-                else if (!_currentLine.Label.Equals("*") && 
-                         !_currentLine.Label.Equals("-") && 
+                else if (!_currentLine.Label.Equals("*") &&
+                         !_currentLine.Label.Equals("-") &&
                          !_currentLine.Label.Equals("+"))
                     label = _localLabelScope = _currentLine.Label;
             }
@@ -450,7 +450,7 @@ namespace DotNetAsm
             return passNeeded;
         }
 
-        void SecondPass()
+        protected void SecondPass()
         {
             const int MAX_PASSES = 4;
             bool passNeeded = true;
@@ -539,8 +539,8 @@ namespace DotNetAsm
 
         /// <remarks>
         /// This does a quick and "dirty" look at instructions. It will catch
-        /// some but not all syntax errors, concerned mostly with the probable 
-        /// size of the instruction. 
+        /// some but not all syntax errors, concerned mostly with the probable
+        /// size of the instruction.
         /// </remarks>
         int GetInstructionSize()
         {
@@ -601,7 +601,7 @@ namespace DotNetAsm
                     {
                         scopedLabel = _currentLine.Scope + _localLabelScope + _currentLine.Label;
                     }
-                    else 
+                    else
                     {
                         _localLabelScope = _currentLine.Label;
                         scopedLabel = _currentLine.Scope + _currentLine.Label;
@@ -798,7 +798,7 @@ namespace DotNetAsm
 
         /// <remarks>
         /// Used by the ToListing method to get the full listing.</remarks>
-        string GetListing()
+        protected string GetListing()
         {
             var listing = new StringBuilder();
 
@@ -836,7 +836,7 @@ namespace DotNetAsm
             if (Options.InputFiles.Count == 0)
                 return;
 
-            if (Options.PrintVersion && DisplayingBanner != null) 
+            if (Options.PrintVersion && DisplayingBanner != null)
             {
                 Console.WriteLine(DisplayingBanner.Invoke(this, true));
                 if (Options.ArgsPassed > 1)

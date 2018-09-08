@@ -1,6 +1,21 @@
-MIT License
+LICENSE AND COPYRIGHT SUMMARY
+
+1. Patcher6502, including both new code and modifications to code from other sources, is copyright drcatdoctor and available via the GPL. 
+   File an issue at https://github.com/drcatdoctor/Patcher6502/issues to get in touch if needed.
+
+2. 6502.net <https://github.com/informedcitizenry/6502.Net> is copyright informedcitizenry and included under the MIT License.
+
+3. The System.CommandLine library is copyright Microsoft and included under the MIT license.
+
+
+LICENSE AND COPYRIGHT FULL TEXTS
+
+
+2. Full text of 6502.Net copyright and license.
 
 Copyright (c) 2017, 2018 informedcitizenry <informedcitizenry@gmail.com>
+
+MIT License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +34,33 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+3. Full text of System.CommandLine copyright and license.
+
+-----------------------------------------------------------------------------
+              MIT License
+              Applies to: dotnet/corefxlab/System.CommandLine 
+              (c) Microsoft Corporation
+----------------------------------------------------------------------------- 
+
+Copyright (c) Microsoft Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
