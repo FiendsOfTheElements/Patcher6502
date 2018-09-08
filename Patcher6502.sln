@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetAsm", "DotNetAsm\DotNetAsm.csproj", "{AF1ED085-0D63-4DFD-AE98-612921D1F5EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnit.Tests", "NUnit.Tests\NUnit.Tests.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{801D6E7E-74B7-4DA0-B866-C0D7FD474F43} = {801D6E7E-74B7-4DA0-B866-C0D7FD474F43}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65F3CE0A-FDA5-438D-A105-AF3DE28915F5}"
 	ProjectSection(SolutionItems) = preProject

@@ -24,7 +24,7 @@ namespace NUnit.Tests.TestDotNetAsm
             List<SourceLine> source = new List<SourceLine>();
             List<SourceLine> processed = new List<SourceLine>();
             
-            ConditionBlockHandler condHandler = new ConditionBlockHandler(_testController, processed);
+            ConditionHandler condHandler = new ConditionHandler(_testController);
 
             source.Add(new SourceLine { Instruction = ".if", Operand = "3 < 4" });
             source.Add(new SourceLine { Instruction = "lda", Operand = "#$03" });
