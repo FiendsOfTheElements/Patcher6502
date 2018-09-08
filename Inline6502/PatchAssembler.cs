@@ -14,8 +14,17 @@ namespace Inline6502
 		}
 	}
 
+    /// <summary>
+    /// Provides methods to generate assembled 6502 code.
+    /// 
+    /// You may want to set bool fields <code>ShowListingInConsole</code> and/or 
+    /// <code>ShowWarningsInConsole</code> to true during debug and testing.
+    /// </summary>
 	public static class PatchAssembler
 	{
+        public static bool ShowListingInConsole = false;
+        public static bool ShowWarningsInConsole = true;
+
 		private class PatchController : AssemblyController
 		{
 			private string _raw_input;
@@ -45,13 +54,14 @@ namespace Inline6502
 					return null;
 
 
-				#if DEBUG
-				Console.WriteLine($"DEBUG -- listing for {name}:");
-				Console.WriteLine(GetListing());
-				Console.WriteLine($"DEBUG -- listing complete for {name}:");
-				#endif
+				if (ShowListingInConsole)
+                {
+                    Console.WriteLine($"-- Listing for {name}:");
+                    Console.WriteLine(GetListing());
+                    Console.WriteLine($"-- Listing complete for {name}:");
+                }
 
-				return Output.GetCompilation().ToArray();
+                return Output.GetCompilation().ToArray();
 			}
 
 			private IEnumerable<SourceLine> GetSourceLines()
@@ -126,12 +136,10 @@ namespace Inline6502
 
 			var result = controller.Assemble(name, set_origin_string + asm);
 
-			#if DEBUG
-			controller.Log.DumpAll();
-			#else
-			if (controller.Log.HasErrors)
+			if (ShowWarningsInConsole)
+			    controller.Log.DumpAll();
+			else if (controller.Log.HasErrors)
 				controller.Log.DumpErrors();
-			#endif
 
 			if (result is null)
 				throw new AssemblyError($"Unable to assemble {name} at {origin}; see console output for details");

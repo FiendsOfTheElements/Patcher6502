@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.1</Version>
     <Authors>drcatdoctor, informedcitizenry</Authors>
     <Company />
@@ -12,6 +12,7 @@
     <PackageProjectUrl>https://github.com/drcatdoctor/Patcher6502</PackageProjectUrl>
     <RepositoryUrl>https://github.com/drcatdoctor/Patcher6502</RepositoryUrl>
     <RepositoryType>github</RepositoryType>
+    <PackageTags>6502</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.6|AnyCPU'">
