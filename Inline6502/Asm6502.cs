@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Inline6502
+namespace Patcher6502
 {
     /// <summary>
     /// A line assembler that will assemble into 6502 instructions.

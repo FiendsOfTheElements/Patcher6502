@@ -54,7 +54,7 @@ namespace DotNetAsm
 
         string GetNamedSymbolValue(string symbol, SourceLine line, string scope)
         {
-            if (symbol.First() == '_')
+            if (symbol.First() == '@')
                 symbol = string.Concat(scope, symbol);
             if (Variables.IsScopedSymbol(symbol, scope))
                 return Variables.GetScopedSymbolValue(symbol, line.Scope).ToString();
@@ -150,7 +150,7 @@ namespace DotNetAsm
                     // we need to make sure we have the updated string
                     lastChar = charval.Last();
                 }
-                else if (tokenBuilder.Length == 0 && (char.IsLetter(c) || c == '_' || c == '*' || c == '+' || c == '-') &&
+                else if (tokenBuilder.Length == 0 && (char.IsLetter(c) || c == '@' || c == '_' || c == '*' || c == '+' || c == '-') &&
                     (lastChar == char.MinValue || lastChar == '(' || lastChar.IsOperator() || lastChar == ','))
                 {
                     // this could the be the first character of a special symbol
@@ -173,7 +173,7 @@ namespace DotNetAsm
                     }
                     else
                     {
-                        // letter or underscore, start to build the token
+                        // letter or at sign or underscore, start to build the token
                         tokenBuilder.Append(c);
                     }
                 }
@@ -193,7 +193,7 @@ namespace DotNetAsm
                             tokenBuilder.Clear();
                         }
                     }
-                    else if (char.IsLetterOrDigit(c) || c == '.' || c == '_')
+                    else if (char.IsLetterOrDigit(c) || c == '.' || c == '@' || c == '_')
                     {
                         tokenBuilder.Append(c);
                     }

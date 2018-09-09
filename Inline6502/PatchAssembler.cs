@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using DotNetAsm;
 
-namespace Inline6502
+namespace Patcher6502
 {
 	public class AssemblyError : Exception
 	{
@@ -20,41 +20,44 @@ namespace Inline6502
     /// You may want to set bool fields <code>ShowListingInConsole</code> and/or 
     /// <code>ShowWarningsInConsole</code> to true during debug and testing.
     /// </summary>
-	public static class PatchAssembler
+	public class PatchAssembler
 	{
-        public static bool ShowListingInConsole = false;
-        public static bool ShowWarningsInConsole = true;
+        public bool ShowListingInConsole = false;
+        public bool ShowWarningsInConsole = true;
+
+        public PatchAssembler() { }
 
 		private class PatchController : AssemblyController
 		{
 			private string _raw_input;
 			private string _reference_name;
+            private PatchAssembler _container;
 
-			public PatchController() : base(new [] {""})
+			public PatchController(PatchAssembler container, AssemblyOptions options) : base(options)
 			{
+                _container = container;
 			}
-
 
 			public byte[] Assemble(string name, string asm)
 			{
 				_reference_name = name;
 				_raw_input = asm;
 
-				var source = Preprocess();
+                var source = Preprocess();
 				if (Log.HasErrors)
 					return null;
 
-				FirstPass(source);
+                FirstPass(source);
 				if (Log.HasErrors)
 					return null;
 
-				SecondPass();
+                SecondPass();
 
 				if (Log.HasErrors)
 					return null;
 
 
-				if (ShowListingInConsole)
+				if (_container.ShowListingInConsole)
                 {
                     Console.WriteLine($"-- Listing for {name}:");
                     Console.WriteLine(GetListing());
@@ -124,17 +127,29 @@ namespace Inline6502
 		///  ");
 		/// </example>
 		/// <exception cref="AssemblyError">if something goes wrong.</exception>
-		public static byte[] Assemble(int origin, string name, string asm)
+		public byte[] Assemble(int origin, string name, string asm, Dictionary<string,int> variables = null, Dictionary<string, int> labels = null)
 		{
 			if (origin < 0 || origin > 0xFFFF)
 				throw new ArgumentOutOfRangeException(nameof(origin));
 
-			var controller = new PatchController();
-			controller.AddAssembler(new Asm6502(controller));
+            // it is very important for caseSensitive to be false here. it interprets even instructions as case-sensitive with it on.
+            var options = new AssemblyOptions();
 
-			string set_origin_string = $"* = ${origin:X4}\n";
+            var controller = new PatchController(this, options);
+            controller.AddAssembler(new Asm6502(controller));
 
-			var result = controller.Assemble(name, set_origin_string + asm);
+            // have to do this every pass because each one clears everything out every time...
+            controller.OnBeginningOfPass += delegate (object sender, EventArgs e)
+            {
+                // load up the symbol table
+                variables?.ToList().ForEach(pair => controller.Symbols.Variables.SetSymbol(pair.Key, pair.Value, isStrict: false));
+                labels?.ToList().ForEach(pair => controller.Symbols.Labels.SetSymbol(pair.Key, pair.Value, isStrict: false));
+
+                // set PC
+                controller.Output.SetPC(origin);
+            };
+
+            var result = controller.Assemble(name, asm);
 
 			if (ShowWarningsInConsole)
 			    controller.Log.DumpAll();
@@ -154,12 +169,12 @@ namespace Inline6502
         /// <remarks>To be clear: the assert will not check anything in Release builds. This is a designed feature of Debug.Assert.</remarks>
         /// <param name="size">Asserted size of the resulting assembled code in bytes.</param>
         /// <seealso cref="Assemble(int, string, string)"/>
-        public static byte[] AssembleAndAssertSize(int origin, int size, string name, string asm)
+        public byte[] AssembleAndAssertSize(int origin, int size, string name, string asm)
 		{
 			var result = Assemble(origin, name, asm);
 			Debug.Assert(result.Length == size);
 			return result;
 		}
 
-	}
+    }
 }

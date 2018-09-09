@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using OpcodeTable = System.Collections.Generic.Dictionary<string, DotNetAsm.Instruction>;
 
-namespace Inline6502
+namespace Patcher6502
 {
     /// <summary>
     /// A line assembler that will assemble into 6502 instructions.

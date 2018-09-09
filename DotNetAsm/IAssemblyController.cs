@@ -53,7 +53,7 @@ namespace DotNetAsm
         /// Gets the command-line arguments passed by the end-user and parses into 
         /// strongly-typed options.
         /// </summary>
-        AsmCommandLineOptions Options { get; }
+        AssemblyOptions Options { get; }
 
         /// <summary>
         /// Checks if a given token is actually an instruction or directive, either

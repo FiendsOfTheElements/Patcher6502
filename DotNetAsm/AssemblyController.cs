@@ -66,6 +66,11 @@ namespace DotNetAsm
 
         #endregion
 
+        /// <summary>
+        /// This happens after the PC is reset and the symbol table cleared, and before any processing of source lines.
+        /// </summary>
+        public event EventHandler OnBeginningOfPass;
+
         #region Constructors
 
         /// <summary>
@@ -77,8 +82,23 @@ namespace DotNetAsm
         {
             Controller = this;
 
-            Options = new AsmCommandLineOptions();
+            Options = new AssemblyOptions();
             Options.ProcessArgs(args);
+
+            InitializeEverything();
+        }
+
+        public AssemblyController(AssemblyOptions ProvidedOptions)
+        {
+            Controller = this;
+
+            Options = ProvidedOptions;
+
+            InitializeEverything();
+        }
+
+        private void InitializeEverything()
+        {
 
             Reserved.Comparer = Options.StringComparar;
 
@@ -157,7 +177,7 @@ namespace DotNetAsm
         /// <returns>True, if the token is a reserved word, otherwise false.</returns>
         public override bool IsReserved(string token) => IsInstruction(token) || Reserved.IsReserved(token);
 
-        bool IsSymbolName(string token, bool allowLeadUnderscore = true, bool allowDot = true)
+        bool IsSymbolName(string token, bool allowLeadAtSign = true, bool allowDot = true)
         {
             // empty string
             if (string.IsNullOrEmpty(token))
@@ -167,8 +187,8 @@ namespace DotNetAsm
             if (IsReserved(token))
                 return false;
 
-            // if leading underscore not allowed
-            if (!allowLeadUnderscore && token.StartsWith("_", Options.StringComparison))
+            // if leading at sign not allowed
+            if (!allowLeadAtSign && token.StartsWith("@", Options.StringComparison))
                 return false;
 
             // if no dots allowed or trailing dot
@@ -262,6 +282,8 @@ namespace DotNetAsm
             int id = 1;
 
             var sourceList = source.ToList();
+
+            OnBeginningOfPass(this, EventArgs.Empty);
 
             for (int i = 0; i < sourceList.Count; i++)
             {
@@ -391,7 +413,7 @@ namespace DotNetAsm
             string label = string.Empty;
             if (!string.IsNullOrEmpty(_currentLine.Label))
             {
-                if (_currentLine.Label.First() == '_')
+                if (_currentLine.Label.First() == '@')
                     label = string.Concat(_localLabelScope, _currentLine.Label);
                 else if (!_currentLine.Label.Equals("*") &&
                          !_currentLine.Label.Equals("-") &&
@@ -465,6 +487,8 @@ namespace DotNetAsm
                 Output.Reset();
 
                 Symbols.Variables.Clear();
+
+                OnBeginningOfPass(this, EventArgs.Empty);
 
                 _localLabelScope = string.Empty;
 
@@ -597,7 +621,7 @@ namespace DotNetAsm
                         return;
                     }
 
-                    if (_currentLine.Label.First() == '_')
+                    if (_currentLine.Label.First() == '@')
                     {
                         scopedLabel = _currentLine.Scope + _localLabelScope + _currentLine.Label;
                     }
@@ -877,7 +901,7 @@ namespace DotNetAsm
 
         #region Properties
 
-        public AsmCommandLineOptions Options { get; private set; }
+        public AssemblyOptions Options { get; private set; }
 
         public Compilation Output { get; private set; }
 
