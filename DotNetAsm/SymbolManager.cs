@@ -21,7 +21,7 @@ namespace DotNetAsm
 
         IAssemblyController _controller;
 
-        Dictionary<int, SourceLine> _anonPlusLines, _anonMinusLines, _orderedMinusLines;
+        Dictionary<int, SourceLine> _anonLines;
 
         #endregion
 
@@ -43,8 +43,7 @@ namespace DotNetAsm
             Labels.AddCrossCheck(Variables);
             Variables.AddCrossCheck(Labels);
 
-            _anonPlusLines = new Dictionary<int, SourceLine>();
-            _anonMinusLines = new Dictionary<int, SourceLine>();
+            _anonLines = new Dictionary<int, SourceLine>();
 
         }
 
@@ -81,16 +80,7 @@ namespace DotNetAsm
 
         public void AddAnonymousLine(SourceLine line)
         {
-            if (line.Label.Equals("+"))
-            {
-                _anonPlusLines.Add(line.Id, line);
-            }    
-            else if (line.Label.Equals("-"))
-            {
-                _anonMinusLines.Add(line.Id, line);
-                // ordered dictionary is invalid now
-                _orderedMinusLines = null;
-            }    
+            _anonLines.Add(line.Id, line);
         }
 
         long GetFirstAnonymousLabelFrom(SourceLine fromLine, string direction)
@@ -105,13 +95,11 @@ namespace DotNetAsm
                 KeyValuePair<int, SourceLine> searched;
                 if (forward)
                 {
-                    searched = _anonPlusLines.FirstOrDefault(l => l.Key > id);
+                    searched = _anonLines.FirstOrDefault(l => l.Key > id);
                 }    
                 else
                 {
-                    if (_orderedMinusLines == null)
-                        _orderedMinusLines = _anonMinusLines.OrderByDescending(l => l.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                    searched = _orderedMinusLines.FirstOrDefault(l => l.Key < id);
+                    searched = _anonLines.LastOrDefault(l => l.Key < id);
                 }  
                 found = searched.Value;
 
@@ -150,15 +138,15 @@ namespace DotNetAsm
                     // we need to make sure we have the updated string
                     lastChar = charval.Last();
                 }
-                else if (tokenBuilder.Length == 0 && (char.IsLetter(c) || c == '@' || c == '_' || c == '*' || c == '+' || c == '-') &&
+                else if (tokenBuilder.Length == 0 && (char.IsLetter(c) || c == '@' || c == '_' || c == '*' || c == ':') &&
                     (lastChar == char.MinValue || lastChar == '(' || lastChar.IsOperator() || lastChar == ','))
                 {
                     // this could the be the first character of a special symbol
-                    if (c == '*' || c == '+' || c == '-')
+                    if (c == '*' || c == ':')
                     {
                         if (!char.IsLetterOrDigit(lastChar) && lastChar != ')')
                         {
-                            if (c == '-' || c == '+')
+                            if (c == ':')
                             {
                                 var nextChar = expression.Substring(i + 1).FirstOrDefault(chr => !char.IsWhiteSpace(chr));
                                 if ((lastChar == '(' && nextChar == ')') || (!char.IsLetterOrDigit(nextChar) && nextChar != '('))
@@ -182,7 +170,7 @@ namespace DotNetAsm
                     if (char.IsWhiteSpace(c) || c.IsOperator() || c == ')')
                     {
                         var last = tokenBuilder[tokenBuilder.Length - 1];
-                        if ((c == '-' || c == '+') && (last == '-' || last == '+') && last == c)
+                        if ((c == '-' || c == '+') && (last == ':' || ((last == '-' || last == '+' ) && last == c)))
                         {
                             // anonymous symbol, i.e. bne -- or bcs ++
                             tokenBuilder.Append(c);
@@ -217,8 +205,8 @@ namespace DotNetAsm
                         throw new ExpressionException(expression);
 
                     string replacement = string.Empty;
-                    if (foundSymbol[0] == '-' || foundSymbol[0] == '+')
-                        replacement = ConvertAnonymous(foundSymbol, line, errorOnAnonymousNotFound);
+                    if (foundSymbol[0] == ':')
+                        replacement = ConvertAnonymous(foundSymbol.Substring(1), line, errorOnAnonymousNotFound);
                     else if (foundSymbol.Equals("*"))
                         replacement = _controller.Output.LogicalPC.ToString();
                     else

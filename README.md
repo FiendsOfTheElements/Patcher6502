@@ -1,3 +1,25 @@
+# Patcher6502, a fork of 6502.Net
+6502.Net documentation left below, unchanged, because it's good and helpful, and because I am lazy. This is a forked package with changes.
+
+The intention of this fork is to make a cc65-compatible assembler that can be controlled programatically. This is to make it easier to write C# that patches 6502 binaries.
+
+By the time you read this, this should be actively used in https://github.com/FiendsOfTheElements/FF1Randomizer.
+
+## User-facing changes in this fork
+  * Local labels should be written as '@Loop', not '_Loop'.
+  * Anonymous labels should be written as ':', not '+' or '-'. You jump to them by referring to them as ':-' or ':+' (or ':--', ':---', etc.)
+  * As a user of this library, you should only really need to call PatchAssembler.Assemble(). See that class for (short and simple) documentation.
+  * You may programatically insert entries into the symbol table, pre-assemble-time, via that method.
+
+## Internal changes in this fork
+  * The above required a number of internal changes, obviously.
+  * Various things had their access modifiers changed so they could be read & written from subclasses, etc.
+  * The AsmCommandLineOptions class has been renamed AssemblyOptions and given an appropriate constructor etc.
+  * An event has been added, AssemblyController.OnBeginningOfPass, which gives you an opportunity to mess with the PC and the symbol table.
+
+
+6502.Net documentation follows.
+
 # 6502.Net, A Simple .Net-Based 6502/65C02/W65C816S Cross-Assembler
 ### Version 1.15.1
 ## Introduction

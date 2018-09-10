@@ -123,7 +123,7 @@ namespace DotNetAsm
 
             Output = new Compilation(!Options.BigEndian);
 
-            _specialLabels = new Regex(@"^\*|\+|-$", RegexOptions.Compiled);
+            _specialLabels = new Regex(@"^(\*|:)$", RegexOptions.Compiled);
 
             Encoding = new AsmEncoding(Options.CaseSensitive);
 
@@ -416,8 +416,7 @@ namespace DotNetAsm
                 if (_currentLine.Label.First() == '@')
                     label = string.Concat(_localLabelScope, _currentLine.Label);
                 else if (!_currentLine.Label.Equals("*") &&
-                         !_currentLine.Label.Equals("-") &&
-                         !_currentLine.Label.Equals("+"))
+                         !_currentLine.Label.Equals(":"))
                     label = _localLabelScope = _currentLine.Label;
             }
 
@@ -431,7 +430,7 @@ namespace DotNetAsm
                 if (string.IsNullOrEmpty(_currentLine.Operand) == false)
                     val = Evaluator.Eval(_currentLine.Operand, int.MinValue, uint.MaxValue);
 
-                if (_currentLine.Label.Equals("-") || _currentLine.Label.Equals("+"))
+                if (_currentLine.Label.Equals(":"))
                 {
                     passNeeded = val != _currentLine.PC;
                 }
